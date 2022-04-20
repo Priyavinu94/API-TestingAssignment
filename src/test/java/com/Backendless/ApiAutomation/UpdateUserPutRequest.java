@@ -21,7 +21,8 @@ public class UpdateUserPutRequest extends TestBase {
 		RestAssured.baseURI = prop.getProperty("baseURI");
 		jsonpath = RestAssured.given()
 				.header(prop.getProperty("requestHeaderKey"), prop.getProperty("requestHeaderValue"))
-				.body(createRequestBody()).when().post("/login").jsonPath();
+				.body(createRequestBody(prop.getProperty("userEmail"), prop.getProperty("userPassword"))).when()
+				.post("/login").jsonPath();
 		userToken = jsonpath.getString("user-token");
 		userId = jsonpath.getString("objectId");
 	}
@@ -31,7 +32,9 @@ public class UpdateUserPutRequest extends TestBase {
 
 		Response response = RestAssured.given()
 				.header(prop.getProperty("requestHeaderKey"), prop.getProperty("requestHeaderValue"))
-				.header("user-token", userToken).body(createRequestBody()).when().put("/" + userId);
+				.header("user-token", userToken)
+				.body(createRequestBody(prop.getProperty("userEmail"), prop.getProperty("userPassword"))).when()
+				.put("/" + userId);
 		response.then().statusCode(200);
 
 		Assert.assertEquals("User email does not match", prop.getProperty("userEmail"),
@@ -40,7 +43,8 @@ public class UpdateUserPutRequest extends TestBase {
 
 	@Test
 	public void validateUpdateUserObjectFailureCode() {
-		RestAssured.given().header("", "").header("user-token", userToken).body(createRequestBody()).when()
-				.put("/" + userId).then().statusCode(400);
+		RestAssured.given().header(prop.getProperty("requestHeaderKey"), prop.getProperty("requestHeaderValue"))
+				.header("user-token", userToken).body(createRequestBody(" ", " ")).when().put("/" + userId).then()
+				.statusCode(400);
 	}
 }

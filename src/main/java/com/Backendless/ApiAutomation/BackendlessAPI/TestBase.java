@@ -28,10 +28,10 @@ public class TestBase {
 	}
 	
 	
-	public JSONObject createRequestBody() {
+	public JSONObject createRequestBody(String email,String password) {
 		JSONObject reqBody = new JSONObject();
-		reqBody.put("login", prop.getProperty("userEmail"));
-		reqBody.put("password", prop.getProperty("userPassword"));
+		reqBody.put("login", email);
+		reqBody.put("password", password);
 		return reqBody;
 	}
 	

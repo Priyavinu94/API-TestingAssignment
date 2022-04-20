@@ -18,13 +18,13 @@ public class LoginPostRequest extends TestBase {
 		RestAssured.baseURI = prop.getProperty("baseURI");
 	}
 
-	@Test
+//	@Test
 	public void validateSuccessStatusCodeAfterUserLogin() {
 
 		RequestSpecification request = RestAssured.given();
 		request.headers(prop.getProperty("requestHeaderKey"), prop.getProperty("requestHeaderValue"));
 
-		request.body(createRequestBody());
+		request.body(createRequestBody(prop.getProperty("userEmail"), prop.getProperty("userPassword")));
 
 		Response response = request.post("/login");
 
@@ -45,7 +45,17 @@ public class LoginPostRequest extends TestBase {
 	@Test
 	public void validateFailureStatusCode() {
 		// calling using chained method
-		RestAssured.given().headers("", "").body(createRequestBody()).when().post("/login").then().statusCode(400);
+		Response response = RestAssured.given()
+				.headers(prop.getProperty("requestHeaderKey"), prop.getProperty("requestHeaderValue"))
+				.body(createRequestBody(" ", " ")).when().post("/login");
+
+		// validating failure status code
+		response.then().statusCode(401);
+
+		Assert.assertTrue("Error code doesn't match",
+				response.jsonPath().getString("code").equals(prop.getProperty("invalidLoginErrorCode")));
+		Assert.assertTrue("Error code doesn't match",
+				response.jsonPath().getString("message").equals(prop.getProperty("invalidLoginErrorMsg")));
 	}
 
 }
